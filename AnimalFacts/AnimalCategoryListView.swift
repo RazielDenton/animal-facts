@@ -10,6 +10,11 @@ import SwiftUI
 struct AnimalCategoryListView: View {
 
     @StateObject private var animalFactsController: AnimalFactsController = .init()
+    @State private var showAdvertAlert = false
+    @State private var showingAdvertisement = false
+    @State private var showComingSoonAlert = false
+    @State private var showAnimalCategoryScreen = false
+    @State private var selectedAnimalCategory: AnimalCategory?
 
     var body: some View {
         NavigationStack {
@@ -25,6 +30,11 @@ struct AnimalCategoryListView: View {
                         animalCategoriesView
                     }
                 }
+
+                if showingAdvertisement {
+                    Color.black.opacity(0.5).ignoresSafeArea()
+                    ProgressView().tint(.white)
+                }
             }
         }
         .task {
@@ -39,17 +49,45 @@ private extension AnimalCategoryListView {
 
     var animalCategoriesView: some View {
         ScrollView {
-            LazyVStack {
+            LazyVStack(spacing: UIDimensions.layoutMargin2x) {
                 ForEach(animalFactsController.animalCategories, id: \.order) { category in
-                    NavigationLink {
-                        AnimalFactsView(animalFacts: category.animalFacts ?? [])
-                            .navigationTitle(category.title)
+                    Button {
+                        selectedAnimalCategory = category
+                        switch category.status {
+                        case .paid:
+                            showAdvertAlert.toggle()
+                        case .free:
+                            showAnimalCategoryScreen.toggle()
+                        case .comingSoon:
+                            showComingSoonAlert.toggle()
+                        }
                     } label: {
                         AnimalCategoryView(animalCategory: category)
                     }
                 }
             }
             .padding(.horizontal)
+        }
+        .alert("Watch Ad to continue", isPresented: $showAdvertAlert) {
+            Button("Cancel", role: .cancel, action: { })
+            Button("Show Ad") {
+                withAnimation {
+                    showingAdvertisement = true
+                }
+                Task {
+                    try? await Task.sleep(nanoseconds: 2_000_000_000)
+                    showingAdvertisement = false
+                    showAnimalCategoryScreen = true
+                }
+            }
+            .keyboardShortcut(.defaultAction)
+        }
+        .alert("Coming Soon", isPresented: $showComingSoonAlert) {
+            Button("Ok", role: .cancel) { }
+        }
+        .navigationDestination(isPresented: $showAnimalCategoryScreen) {
+            AnimalFactsView(animalFacts: selectedAnimalCategory?.animalFacts ?? [])
+                .navigationTitle(selectedAnimalCategory?.title ?? "")
         }
     }
 }

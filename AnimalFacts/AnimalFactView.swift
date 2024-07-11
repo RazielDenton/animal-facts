@@ -49,6 +49,8 @@ private extension AnimalFactView {
                         .scaledToFill()
                 case .failure:
                     Image(systemName: "photo")
+                        .imageScale(.large)
+                        .foregroundColor(.gray)
                 @unknown default:
                     EmptyView()
                 }
