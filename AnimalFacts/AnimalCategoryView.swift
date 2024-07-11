@@ -18,7 +18,10 @@ struct AnimalCategoryView: View {
     var body: some View {
         ZStack {
             Color.white
-            animalCategoryCardView
+            animalCategoryCardView.opacity(animalCategory.status == .comingSoon ? 0.6 : 1.0)
+            if animalCategory.status == .comingSoon {
+                comingSoonView
+            }
         }
         .frame(height: .animalCategoryHeight)
         .clipShape(.rect(cornerRadius: UIDimensions.defaultCornerRadius))
@@ -42,6 +45,7 @@ private extension AnimalCategoryView {
                 VStack(alignment: .leading) {
                     Text(animalCategory.title)
                         .font(.headline)
+                        .foregroundStyle(.black)
                         .lineLimit(1)
                     Text(animalCategory.description)
                         .font(.subheadline)
@@ -51,7 +55,7 @@ private extension AnimalCategoryView {
                     if animalCategory.status == .paid {
                         Text("\(Image(systemName: "lock.fill")) Premium")
                             .foregroundStyle(Color.blue)
-                            .font(.title3)
+                            .font(.body)
                     }
                 }
                 Spacer()
@@ -72,10 +76,24 @@ private extension AnimalCategoryView {
                         .scaledToFill()
                 case .failure:
                     Image(systemName: "photo")
+                        .imageScale(.large)
+                        .foregroundColor(.gray)
                 @unknown default:
                     EmptyView()
                 }
             }
+        }
+    }
+
+    var comingSoonView: some View {
+        HStack {
+            Spacer()
+            Image(.comingSoon)
+                .resizable()
+                .scaledToFit()
+                .frame(maxHeight: .animalCategoryHeight)
+                .rotationEffect(.degrees(-15))
+                .padding(.vertical, UIDimensions.layoutMargin)
         }
     }
 }
@@ -86,9 +104,9 @@ private extension AnimalCategoryView {
     AnimalCategoryView(animalCategory: .init(
         order: 1,
         title: "Cats 🐈",
-        description: "Different facts about cats",
+        description: "Different facts about cats Different facts about cats Different facts about cats Different facts about cats Different facts about cats Different facts about cats Different facts about cats Different facts about cats",
         image: "https://images6.alphacoders.com/337/337780.jpg",
-        content: nil,
-        status: .paid
+        animalFacts: nil,
+        status: .comingSoon
     ))
 }

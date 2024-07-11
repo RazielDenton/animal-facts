@@ -42,7 +42,7 @@ private extension AnimalCategoryListView {
             LazyVStack {
                 ForEach(animalFactsController.animalCategories, id: \.order) { category in
                     NavigationLink {
-                        AnimalFactsView(animalFacts: category.content ?? [])
+                        AnimalFactsView(animalFacts: category.animalFacts ?? [])
                             .navigationTitle(category.title)
                     } label: {
                         AnimalCategoryView(animalCategory: category)
