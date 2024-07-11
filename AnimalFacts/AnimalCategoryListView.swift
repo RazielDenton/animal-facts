@@ -12,20 +12,49 @@ struct AnimalCategoryListView: View {
     @StateObject private var animalFactsController: AnimalFactsController = .init()
 
     var body: some View {
-        ZStack {
-            Color.background.ignoresSafeArea()
-            VStack {
-                ForEach(animalFactsController.animalCategories, id: \.order) { category in
-                    AnimalCategoryView(animalCategory: category)
+        NavigationStack {
+            ZStack {
+                Color.background.ignoresSafeArea()
+
+                if animalFactsController.isLoading {
+                    ProgressView()
+                } else {
+                    if animalFactsController.animalCategories.isEmpty {
+                        Text("Sorry for the inconvenience")
+                    } else {
+                        animalCategoriesView
+                    }
                 }
             }
-            .padding()
         }
         .task {
             animalFactsController.loadAnimalCategories()
         }
     }
 }
+
+// MARK: - Views
+
+private extension AnimalCategoryListView {
+
+    var animalCategoriesView: some View {
+        ScrollView {
+            LazyVStack {
+                ForEach(animalFactsController.animalCategories, id: \.order) { category in
+                    NavigationLink {
+                        AnimalFactsView(animalFacts: category.content ?? [])
+                            .navigationTitle(category.title)
+                    } label: {
+                        AnimalCategoryView(animalCategory: category)
+                    }
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+}
+
+// MARK: - Preview
 
 #Preview {
     AnimalCategoryListView()
