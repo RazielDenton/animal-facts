@@ -12,10 +12,15 @@ struct AnimalCategoryListView: View {
     @StateObject private var animalFactsController: AnimalFactsController = .init()
 
     var body: some View {
-        VStack {
-            Text(animalFactsController.animalCategories.first?.title ?? "Hello, world!")
+        ZStack {
+            Color.background.ignoresSafeArea()
+            VStack {
+                ForEach(animalFactsController.animalCategories, id: \.order) { category in
+                    AnimalCategoryView(animalCategory: category)
+                }
+            }
+            .padding()
         }
-        .padding()
         .task {
             animalFactsController.loadAnimalCategories()
         }
