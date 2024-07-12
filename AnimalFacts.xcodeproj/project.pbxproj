@@ -19,7 +19,22 @@
 		1387ED762C40284000CA82F7 /* UIDimensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1387ED752C40284000CA82F7 /* UIDimensions.swift */; };
 		1387ED782C40333900CA82F7 /* AnimalFactView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1387ED772C40333900CA82F7 /* AnimalFactView.swift */; };
 		1387ED7A2C40338C00CA82F7 /* AnimalFactsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1387ED792C40338C00CA82F7 /* AnimalFactsView.swift */; };
+		1387ED7C2C4088A000CA82F7 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 1387ED6B2C4019A700CA82F7 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1387ED7D2C4088A000CA82F7 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				1387ED7C2C4088A000CA82F7 /* RealmSwift in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1387ED552C40189C00CA82F7 /* AnimalFacts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AnimalFacts.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -117,6 +132,7 @@
 				1387ED512C40189C00CA82F7 /* Sources */,
 				1387ED522C40189C00CA82F7 /* Frameworks */,
 				1387ED532C40189C00CA82F7 /* Resources */,
+				1387ED7D2C4088A000CA82F7 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

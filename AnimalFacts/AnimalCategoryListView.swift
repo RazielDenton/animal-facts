@@ -10,6 +10,7 @@ import SwiftUI
 struct AnimalCategoryListView: View {
 
     @StateObject private var animalFactsController: AnimalFactsController = .init()
+    @State private var isLoading = true
     @State private var showAdvertAlert = false
     @State private var showingAdvertisement = false
     @State private var showComingSoonAlert = false
@@ -21,7 +22,7 @@ struct AnimalCategoryListView: View {
             ZStack {
                 Color.background.ignoresSafeArea()
 
-                if animalFactsController.isLoading {
+                if isLoading {
                     ProgressView()
                 } else {
                     if animalFactsController.animalCategories.isEmpty {
@@ -36,9 +37,11 @@ struct AnimalCategoryListView: View {
                     ProgressView().tint(.white)
                 }
             }
+            .navigationTitle("")
         }
         .task {
-            animalFactsController.loadAnimalCategories()
+            await animalFactsController.loadAnimalCategories()
+            isLoading = false
         }
     }
 }
@@ -88,6 +91,9 @@ private extension AnimalCategoryListView {
         .navigationDestination(isPresented: $showAnimalCategoryScreen) {
             AnimalFactsView(animalFacts: selectedAnimalCategory?.animalFacts ?? [])
                 .navigationTitle(selectedAnimalCategory?.title ?? "")
+        }
+        .refreshable {
+            await animalFactsController.loadAnimalCategories()
         }
     }
 }
