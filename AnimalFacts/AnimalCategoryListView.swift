@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 
 struct AnimalCategoryListView: View {
 
-    @StateObject private var animalFactsController: AnimalFactsController = .init()
-    @State private var isLoading = true
+    let store: StoreOf<AnimalFactsFeature>
+
     @State private var showAdvertAlert = false
     @State private var showingAdvertisement = false
     @State private var showComingSoonAlert = false
@@ -22,10 +23,10 @@ struct AnimalCategoryListView: View {
             ZStack {
                 Color.background.ignoresSafeArea()
 
-                if isLoading {
+                if store.isLoading {
                     ProgressView()
                 } else {
-                    if animalFactsController.animalCategories.isEmpty {
+                    if store.animalCategories.isEmpty {
                         Text("Sorry for the inconvenience")
                     } else {
                         animalCategoriesView
@@ -40,8 +41,7 @@ struct AnimalCategoryListView: View {
             .navigationTitle("")
         }
         .task {
-            await animalFactsController.loadAnimalCategories()
-            isLoading = false
+            store.send(.loadAnimalCategories)
         }
     }
 }
@@ -53,7 +53,7 @@ private extension AnimalCategoryListView {
     var animalCategoriesView: some View {
         ScrollView {
             LazyVStack(spacing: UIDimensions.layoutMargin2x) {
-                ForEach(animalFactsController.animalCategories, id: \.order) { category in
+                ForEach(store.animalCategories, id: \.order) { category in
                     Button {
                         selectedAnimalCategory = category
                         switch category.status {
@@ -93,7 +93,7 @@ private extension AnimalCategoryListView {
                 .navigationTitle(selectedAnimalCategory?.title ?? "")
         }
         .refreshable {
-            await animalFactsController.loadAnimalCategories()
+            store.send(.refresh)
         }
     }
 }
@@ -101,5 +101,22 @@ private extension AnimalCategoryListView {
 // MARK: - Preview
 
 #Preview {
-    AnimalCategoryListView()
+    AnimalCategoryListView(
+        store: Store(
+            initialState: AnimalFactsFeature.State(
+                animalCategories: [
+                    .init(
+                        order: 1,
+                        title: "Cats 🐈",
+                        description: "Different facts about cats",
+                        image: "https://images6.alphacoders.com/337/337780.jpg",
+                        animalFacts: nil,
+                        status: .comingSoon
+                    )
+                ]
+            )
+        ) {
+            AnimalFactsFeature()
+        }
+    )
 }
