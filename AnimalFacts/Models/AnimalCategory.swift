@@ -5,7 +5,7 @@
 //  Created by Viacheslav on 11.07.2024.
 //
 
-struct AnimalCategory: Codable, Hashable {
+struct AnimalCategory: Codable, Equatable {
 
     let order: Int
     let title: String
@@ -45,8 +45,8 @@ extension AnimalCategory {
 
     enum CategoryStatus: String, Codable {
 
-        case paid
         case free
+        case paid
         case comingSoon
     }
 

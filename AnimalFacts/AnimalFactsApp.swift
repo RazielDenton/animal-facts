@@ -11,8 +11,8 @@ import ComposableArchitecture
 @main
 struct AnimalFactsApp: App {
 
-    static let store = Store(initialState: AnimalFactsFeature.State()) {
-        AnimalFactsFeature()
+    static let store = Store(initialState: AnimalCategoriesFeature.State()) {
+        AnimalCategoriesFeature()
             ._printChanges()
     }
 
