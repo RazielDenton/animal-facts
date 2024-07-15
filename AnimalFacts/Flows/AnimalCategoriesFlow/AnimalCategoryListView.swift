@@ -85,9 +85,9 @@ private extension AnimalCategoryListView {
                     .init(
                         order: 1,
                         title: "Cats 🐈",
-                        description: "Different facts about cats",
+                        categoryDescription: "Different facts about cats",
                         image: "https://images6.alphacoders.com/337/337780.jpg",
-                        animalFacts: nil,
+                        animalFacts: [],
                         status: .comingSoon
                     )
                 ]

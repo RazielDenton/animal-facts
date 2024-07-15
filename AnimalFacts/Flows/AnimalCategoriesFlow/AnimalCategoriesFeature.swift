@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import RealmSwift
 
 @Reducer
 struct AnimalCategoriesFeature {
@@ -43,25 +44,27 @@ struct AnimalCategoriesFeature {
 
     @Dependency(\.continuousClock) var clock
     @Dependency(\.animalFactsClient) var animalFactsClient
+    @ObservedResults(
+        AnimalCategory.self,
+        sortDescriptor: SortDescriptor(keyPath: "order", ascending: true)
+    ) var animalCategoryResults
 
     var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
             case .loadAnimalCategories:
                 state.isLoading = true
-                return .run { send in
-                    await send(.animalFactsResponse(Result { try await animalFactsClient.loadAnimalCategories() }))
-                }
+                state.animalCategories = Array(animalCategoryResults.sorted(by: \.order, ascending: true))
+                return loadAnimalCategories()
             case .refresh:
-                return .run { send in
-                    await send(
-                        .animalFactsResponse(Result { try await animalFactsClient.loadAnimalCategories() }),
-                        animation: .default
-                    )
-                }
+                return loadAnimalCategories()
             case .animalFactsResponse(.success(let animalCategories)):
                 state.isLoading = false
                 state.animalCategories = animalCategories
+                let realm = try? Realm()
+                try? realm?.write {
+                    realm?.add(animalCategories, update: .modified)
+                }
                 return .none
             case .animalFactsResponse(.failure(let error)):
                 state.isLoading = false
@@ -99,6 +102,15 @@ private extension AnimalCategoriesFeature {
         case error(Error)
         case advertisement
         case comingSoon
+    }
+
+    func loadAnimalCategories() -> Effect<Action> {
+        return .run { send in
+            await send(
+                .animalFactsResponse(Result { try await animalFactsClient.loadAnimalCategories() }),
+                animation: .default
+            )
+        }
     }
 
     func showAlert(ofType type: AlertType, _ state: inout State) -> Effect<Action> {
@@ -143,7 +155,7 @@ private extension AnimalCategoriesFeature {
     func showAnimalFactsScreen(_ state: inout State) -> Effect<Action> {
         state.destination = .animalFactsScreen(
             AnimalFactsFeature.State(
-                animalFacts: state.selectedAnimalCategory?.animalFacts ?? []
+                animalFacts: Array(state.selectedAnimalCategory?.animalFacts ?? List<AnimalCategory.AnimalFact>())
             )
         )
         return .none

@@ -47,7 +47,7 @@ private extension AnimalCategoryView {
                         .font(.headline)
                         .foregroundStyle(.black)
                         .lineLimit(1)
-                    Text(animalCategory.description)
+                    Text(animalCategory.categoryDescription)
                         .font(.subheadline)
                         .foregroundStyle(.gray)
                         .multilineTextAlignment(.leading)
@@ -104,9 +104,9 @@ private extension AnimalCategoryView {
     AnimalCategoryView(animalCategory: .init(
         order: 1,
         title: "Cats 🐈",
-        description: "Different facts about cats Different facts about cats Different facts about cats Different facts about cats Different facts about cats Different facts about cats Different facts about cats Different facts about cats",
+        categoryDescription: "Different facts about cats Different facts about cats Different facts about cats Different facts about cats Different facts about cats Different facts about cats Different facts about cats Different facts about cats",
         image: "https://images6.alphacoders.com/337/337780.jpg",
-        animalFacts: nil,
+        animalFacts: [],
         status: .comingSoon
     ))
 }

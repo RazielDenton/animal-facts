@@ -5,33 +5,50 @@
 //  Created by Viacheslav on 11.07.2024.
 //
 
-struct AnimalCategory: Codable, Equatable {
+import Foundation
+import RealmSwift
 
-    let order: Int
-    let title: String
-    let description: String
-    let image: String
-    let animalFacts: [AnimalFact]?
-    let status: CategoryStatus
+final class AnimalCategory: Object, ObjectKeyIdentifiable, Decodable {
 
-    init(order: Int, title: String, description: String, image: String, animalFacts: [AnimalFact]?, status: CategoryStatus) {
+    @Persisted(primaryKey: true) var order: Int
+    @Persisted var title: String
+    @Persisted var categoryDescription: String
+    @Persisted var image: String
+    @Persisted var animalFacts: RealmSwift.List<AnimalFact>
+    @Persisted var status: CategoryStatus
+
+    override init() {
+        super.init()
+    }
+
+    convenience init(
+        order: Int,
+        title: String,
+        categoryDescription: String,
+        image: String,
+        animalFacts: [AnimalFact],
+        status: CategoryStatus
+    ) {
+        self.init()
         self.order = order
         self.title = title
-        self.description = description
+        self.categoryDescription = description
         self.image = image
-        self.animalFacts = animalFacts
+        self.animalFacts.append(objectsIn: animalFacts)
         self.status = status
     }
 
     init(from decoder: any Decoder) throws {
+        super.init()
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.order = try container.decode(Int.self, forKey: .order)
         self.title = try container.decode(String.self, forKey: .title)
-        self.description = try container.decode(String.self, forKey: .description)
+        self.categoryDescription = try container.decode(String.self, forKey: .categoryDescription)
         self.image = try container.decode(String.self, forKey: .image)
-        self.animalFacts = try container.decodeIfPresent([AnimalFact].self, forKey: .animalFacts)
+        let animalFacts = try container.decodeIfPresent(List<AnimalFact>.self, forKey: .animalFacts) ?? List<AnimalFact>()
+        self.animalFacts = animalFacts
 
-        if self.animalFacts == nil {
+        if animalFacts.isEmpty {
             self.status = .comingSoon
         } else {
             self.status = try container.decode(CategoryStatus.self, forKey: .status)
@@ -43,17 +60,28 @@ struct AnimalCategory: Codable, Equatable {
 
 extension AnimalCategory {
 
-    enum CategoryStatus: String, Codable {
+    enum CategoryStatus: String, PersistableEnum, Decodable {
 
         case free
         case paid
         case comingSoon
     }
 
-    struct AnimalFact: Codable, Hashable {
+    @objc(AnimalFact) class AnimalFact: Object, ObjectKeyIdentifiable, Decodable {
 
-        let fact: String
-        let image: String
+        @Persisted var fact: String
+        @Persisted var image: String
+        @Persisted(originProperty: "animalFacts") var category: LinkingObjects<AnimalCategory>
+
+        override init() {
+            super.init()
+        }
+
+        convenience init(fact: String, image: String) {
+            self.init()
+            self.fact = fact
+            self.image = image
+        }
     }
 }
 
@@ -64,9 +92,17 @@ private extension AnimalCategory {
     enum CodingKeys: String, CodingKey {
         case order
         case title
-        case description
+        case categoryDescription = "description"
         case image
         case animalFacts = "content"
         case status
+    }
+}
+
+private extension AnimalCategory.AnimalFact {
+
+    enum CodingKeys: String, CodingKey {
+        case fact
+        case image
     }
 }
